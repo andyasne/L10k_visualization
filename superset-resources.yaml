@@ -1,0 +1,371 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "13"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"superset"},"name":"superset","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"superset"}},"template":{"metadata":{"labels":{"app":"superset"}},"spec":{"containers":[{"env":[{"name":"SUPERSET_DATABASE_URI","value":"postgresql+psycopg2://superset:superset@superset-postgres:5999/superset"},{"name":"SUPERSET_PORT","value":"8088"},{"name":"SECRET_KEY","value":"Qy04j8G9NNcgH9Xa91pnpGJVQM2dJjmUn54foPsV1ahggRAWxSdGki98"},{"name":"SUPERSET_CONFIG_PATH","value":"/app/superset/superset_config.py"}],"image":"apache/superset:latest","name":"superset","ports":[{"containerPort":8088}],"readinessProbe":{"failureThreshold":5,"httpGet":{"path":"/health","port":8088},"initialDelaySeconds":60,"periodSeconds":10,"timeoutSeconds":5},"volumeMounts":[{"mountPath":"/app/superset/superset_config.py","name":"superset-config","subPath":"superset_config.py"}]}],"initContainers":[{"args":["superset db upgrade\nsuperset init\n"],"command":["sh","-c"],"env":[{"name":"SUPERSET_DATABASE_URI","value":"postgresql+psycopg2://superset:superset@superset-postgres:5999/superset"},{"name":"SUPERSET_CONFIG_PATH","value":"/app/superset/superset_config.py"},{"name":"SECRET_KEY","value":"Qy04j8G9NNcgH9Xa91pnpGJVQM2dJjmUn54foPsV1ahggRAWxSdGki98"}],"image":"apache/superset:latest","name":"init-db","volumeMounts":[{"mountPath":"/app/superset/superset_config.py","name":"superset-config","subPath":"superset_config.py"}]}],"volumes":[{"configMap":{"name":"superset-config"},"name":"superset-config"}]}}}}
+    creationTimestamp: "2025-03-10T14:46:55Z"
+    generation: 20
+    labels:
+      app: superset
+    name: superset
+    namespace: default
+    resourceVersion: "625294"
+    uid: ee750283-856a-420b-bf2e-0eacf1695de0
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: superset
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2025-03-19T16:23:24+03:00"
+        creationTimestamp: null
+        labels:
+          app: superset
+      spec:
+        containers:
+        - env:
+          - name: SUPERSET_DATABASE_URI
+            value: postgresql://superset:superset@superset-postgres:5999/superset
+          - name: SUPERSET_PORT
+            value: "8088"
+          - name: SECRET_KEY
+            value: Qy04j8G9NNcgH9Xa91pnpGJVQM2dJjmUn54foPsV1ahggRAWxSdGki98
+          - name: SUPERSET_CONFIG_PATH
+            value: /app/superset/superset_config.py
+          image: superset-custom:latest
+          imagePullPolicy: IfNotPresent
+          name: superset
+          ports:
+          - containerPort: 8088
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8088
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/superset/superset_config.py
+            name: superset-config
+            subPath: superset_config.py
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - |
+            superset db upgrade
+            superset init
+          command:
+          - sh
+          - -c
+          env:
+          - name: SUPERSET_DATABASE_URI
+            value: postgresql://superset:superset@superset-postgres:5999/superset
+          - name: SUPERSET_CONFIG_PATH
+            value: /app/superset/superset_config.py
+          - name: SECRET_KEY
+            value: Qy04j8G9NNcgH9Xa91pnpGJVQM2dJjmUn54foPsV1ahggRAWxSdGki98
+          image: superset-custom:latest
+          imagePullPolicy: IfNotPresent
+          name: init-db
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/superset/superset_config.py
+            name: superset-config
+            subPath: superset_config.py
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: superset-config
+          name: superset-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2025-03-19T13:39:23Z"
+      lastUpdateTime: "2025-03-19T13:39:23Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2025-03-19T13:37:39Z"
+      lastUpdateTime: "2025-03-19T13:39:43Z"
+      message: ReplicaSet "superset-6f9dfbbd46" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 20
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"superset"},"name":"superset","namespace":"default"},"spec":{"ports":[{"port":5001,"protocol":"TCP","targetPort":8088}],"selector":{"app":"superset"},"type":"LoadBalancer"}}
+    creationTimestamp: "2025-03-18T01:42:32Z"
+    labels:
+      app: superset
+    name: superset
+    namespace: default
+    resourceVersion: "543591"
+    uid: 052a0390-286f-40a2-93ee-428b488e1289
+  spec:
+    allocateLoadBalancerNodePorts: true
+    clusterIP: 10.107.83.33
+    clusterIPs:
+    - 10.107.83.33
+    externalTrafficPolicy: Cluster
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - nodePort: 30311
+      port: 5001
+      protocol: TCP
+      targetPort: 8088
+    selector:
+      app: superset
+    sessionAffinity: None
+    type: LoadBalancer
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.107.83.33
+        ipMode: VIP
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2025-03-19T16:23:24+03:00"
+    creationTimestamp: "2025-03-19T13:37:39Z"
+    generateName: superset-6f9dfbbd46-
+    labels:
+      app: superset
+      pod-template-hash: 6f9dfbbd46
+    name: superset-6f9dfbbd46-crdzf
+    namespace: default
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: superset-6f9dfbbd46
+      uid: a78205f6-a0df-4726-b07a-f38df615a029
+    resourceVersion: "625279"
+    uid: b4772cf4-4c99-473c-89e6-f24c0766168b
+  spec:
+    containers:
+    - env:
+      - name: SUPERSET_DATABASE_URI
+        value: postgresql://superset:superset@superset-postgres:5999/superset
+      - name: SUPERSET_PORT
+        value: "8088"
+      - name: SECRET_KEY
+        value: Qy04j8G9NNcgH9Xa91pnpGJVQM2dJjmUn54foPsV1ahggRAWxSdGki98
+      - name: SUPERSET_CONFIG_PATH
+        value: /app/superset/superset_config.py
+      image: superset-custom:latest
+      imagePullPolicy: IfNotPresent
+      name: superset
+      ports:
+      - containerPort: 8088
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 5
+        httpGet:
+          path: /health
+          port: 8088
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /app/superset/superset_config.py
+        name: superset-config
+        subPath: superset_config.py
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-2gq8c
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - args:
+      - |
+        superset db upgrade
+        superset init
+      command:
+      - sh
+      - -c
+      env:
+      - name: SUPERSET_DATABASE_URI
+        value: postgresql://superset:superset@superset-postgres:5999/superset
+      - name: SUPERSET_CONFIG_PATH
+        value: /app/superset/superset_config.py
+      - name: SECRET_KEY
+        value: Qy04j8G9NNcgH9Xa91pnpGJVQM2dJjmUn54foPsV1ahggRAWxSdGki98
+      image: superset-custom:latest
+      imagePullPolicy: IfNotPresent
+      name: init-db
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /app/superset/superset_config.py
+        name: superset-config
+        subPath: superset_config.py
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-2gq8c
+        readOnly: true
+    nodeName: minikube
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: superset-config
+      name: superset-config
+    - name: kube-api-access-2gq8c
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-03-19T13:37:44Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-03-19T13:38:36Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-03-19T13:39:43Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-03-19T13:39:43Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-03-19T13:37:39Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://56fbaba840aa89096400ea70d31f2a2d2dd77dcec84caac5883059e54137014d
+      image: superset-custom:latest
+      imageID: docker://sha256:be2ef46b31418b840d212faf6bfb4c30972265934736b38c2004218f26825d84
+      lastState: {}
+      name: superset
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-03-19T13:38:40Z"
+      volumeMounts:
+      - mountPath: /app/superset/superset_config.py
+        name: superset-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-2gq8c
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 192.168.49.2
+    hostIPs:
+    - ip: 192.168.49.2
+    initContainerStatuses:
+    - containerID: docker://1bd580f70acdd32c398bc88d7ff2b7102f20a498dfb3b7922540e9c41b091b0c
+      image: superset-custom:latest
+      imageID: docker://sha256:be2ef46b31418b840d212faf6bfb4c30972265934736b38c2004218f26825d84
+      lastState: {}
+      name: init-db
+      ready: true
+      restartCount: 1
+      started: false
+      state:
+        terminated:
+          containerID: docker://1bd580f70acdd32c398bc88d7ff2b7102f20a498dfb3b7922540e9c41b091b0c
+          exitCode: 0
+          finishedAt: "2025-03-19T13:38:35Z"
+          reason: Completed
+          startedAt: "2025-03-19T13:38:21Z"
+      volumeMounts:
+      - mountPath: /app/superset/superset_config.py
+        name: superset-config
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-2gq8c
+        readOnly: true
+        recursiveReadOnly: Disabled
+    phase: Running
+    podIP: 10.244.0.48
+    podIPs:
+    - ip: 10.244.0.48
+    qosClass: BestEffort
+    startTime: "2025-03-19T13:37:39Z"
+kind: List
+metadata:
+  resourceVersion: ""
+apiVersion: v1
+items: []
+kind: List
+metadata:
+  resourceVersion: ""
